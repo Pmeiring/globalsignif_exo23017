@@ -1,0 +1,20 @@
+JobBatchName   = significanceToys
+executable     = run.sh
+output         = logs/out_$(MASSPOINT)_$(SEED).txt
+error          = logs/err_$(MASSPOINT)_$(SEED).txt
+log            = logs/log_$(MASSPOINT)_$(SEED).txt
++SingularityImage = "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/batch-team/containers/plusbatch/cc7-full:latest"
++JobFlavour     = "tomorrow"
+getenv = True
+
+transfer_input_files = CMSSW_10_6_26.tgz
+arguments = 1000 $(MASSPOINT) $(SEED) 0 1
+
+queue MASSPOINT, SEED from (
+	100_60_0 9
+	100_60_0 28
+	100_60_0 44
+	100_60_0 54
+	100_60_0 56
+	100_60_0 74
+)
