@@ -28,9 +28,25 @@ On CMS Connect:
 
 ```
 git clone git@github.com:Pmeiring/globalsignif_exo23017.git
+cd globalsignif_exo23017
 ```
 
 ## Step 4a: Test interactively
 
+The ```run.sh``` script can be used both for toy generation and signficance computation. It takes a few arguments:
+```
+./run.sh NTOYS MP SEED GENERATE SIGNIFICANCE
+```
+where:
+- NTOYS = number of toys per mass-point (and per condor job)
+- MP = signal point, formatted as mN2_mN1_ctau (eg. 100_60_0)
+- SEED = random seed. When running on condor, we fix the seed to the job number
+- GENERATE = boolean indicating if you want to generate the toys
+- SIGNIFICANCE = boolean indicating if you want to compute significances
+
+For example, try running the toy generation:
+```
+./run 10 100_60_0 42 1 0
+```
 
 ## Step 4b: Submit (many!) remote jobs
