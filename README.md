@@ -25,7 +25,7 @@ To use these tools and submit condor jobs, you'll need to set up a git-key and v
 
 For the git-key, follow [these instructions](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key) to generate the key. Then upload the key contents on your github page --> Settings --> SSH and GPG keys --> New SSH key.
 
-For the voms-proxy, use the above quick-start guide ("Setting up your proxy certificates"). Basically, there is already a script on CMS Connect that copies the your voms key from the ~/.globus folder on lxplus, so you can simply use that.
+For the voms-proxy, use the above quick-start guide ("Setting up your proxy certificates"). Basically, there is already a script on CMS Connect that copies the voms key from your ```~/.globus``` folder on lxplus, so you can simply use that.
 
 **Be sure to activate it as usual:**
 ```
@@ -40,7 +40,7 @@ git clone git@github.com:Pmeiring/globalsignif_exo23017.git
 cd globalsignif_exo23017
 xrdcp root://eoscms.cern.ch//eos/cms/store/group/phys_susy/SOS/CMSSW_10_6_26.tgz ./
 ```
-The ```CMSSW_10_6_26.tgz``` files is a pre-compiled release that includes combine. For simplicity it can be copied from EOS as shown above, but one could also set it up with a singularity image on CMS Connect.
+The ```CMSSW_10_6_26.tgz``` file is a pre-compiled release that includes combine. For simplicity it can be copied from EOS as shown above, but one could also set it up with a singularity image on CMS Connect.
 
 ## Step 4a: Test interactively
 
