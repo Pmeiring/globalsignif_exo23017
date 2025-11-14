@@ -2,7 +2,7 @@
 
 This file provides instructions to set up the tools on CMS Connect for generating toys and computing significances for the large number of signal hypotheses in CMS-EXO-23-017. 
 
-## Step 1: Set up CMS-Connect
+## Step 1: Set up CMS Connect
 CMS Connect is a service designed to provide a Tier3-like environment for condor analysis jobs and enables users to submit to all resources available in the CMS Global Pool. A quickstart guide is available here:
 
 https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookCMSConnect#QuickStart
@@ -14,6 +14,10 @@ https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookCMSConnect#QuickStart
 Note that - while opening the account is quick - it might take a while (>hours) for the SSH key to propagate and you to have access to CMS Connect. Eventually, you should be able to connect without it asking for a login-password (only for the pass-phrase you set in generating the SSH key):
 ```
 ssh [replace.username]@login.uscms.org
+```
+If you stored your SSH key not in the default path (```~/.ssh/id_rsa```), but in another path (eg. ```~/.ssh/id_rsa_cmsconnect```), you should explicitely point to that path when trying to access CMS Connect:
+```
+ssh -i ~/.ssh/id_rsa_cmsconnect [replace.username]@login.uscms.org
 ```
 
 ## Step 2: Set up git-key & voms-proxy
@@ -36,7 +40,7 @@ git clone git@github.com:Pmeiring/globalsignif_exo23017.git
 cd globalsignif_exo23017
 xrdcp root://eoscms.cern.ch//eos/cms/store/group/phys_susy/SOS/CMSSW_10_6_26.tgz ./
 ```
-The ```CMSSW_10_6_26.tgz``` files is a pre-compiled release that includes combine. For simplicity it can be copied from EOS as shown above, but one could also set it up with a singularity image on CMS-Connect.
+The ```CMSSW_10_6_26.tgz``` files is a pre-compiled release that includes combine. For simplicity it can be copied from EOS as shown above, but one could also set it up with a singularity image on CMS Connect.
 
 ## Step 4a: Test interactively
 
@@ -72,7 +76,7 @@ We first need to generate the toys. The toy generation is by default configured 
 condor_submit condor/generate_toys.sub
 ```
 
-Once all toys are in place, the time-consuming second step is to compute for each toy the significance for all mass-points. In EXO-23-017 we have 294 (C1,dM) mass-hypotheses, so that's already 294*330=97020 jobs, each running 1000 significance computations over ~24h. From CMS-Connect you cannot submit all 97k at once, so you'll have to submit them in batches. Submitting them in batches of 100 GeV in mC1 seems to work well, ie. ```100_50_0``` to ```175_174p4_0```.
+Once all toys are in place, the time-consuming second step is to compute for each toy the significance for all mass-points. In CMS-EXO-23-017 we have 294 (C1,dM) mass-hypotheses, so that's already 294*330=97020 jobs, each running 1000 significance computations over ~24h. From CMS Connect you cannot submit all 97k at once, so you'll have to submit them in batches. Submitting them in batches of 100 GeV in mC1 seems to work well, ie. ```100_50_0``` to ```175_174p4_0```.
 ```
 condor_submit condor/compute_signif.sub
 ```
