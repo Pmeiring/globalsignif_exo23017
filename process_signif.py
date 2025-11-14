@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+import os, argparse, re, uproot
+import numpy as np
+from tqdm import tqdm
+
+indir = "/eos/cms/store/group/phys_susy/SOS/globalsignif_toys_negstaticv2/signif/" # directory with significances
+n_jobs = 330                    # number of toy jobs per mass point
+n_toys_per_file = 1000          # number of toys in each ROOT file
+
+signals=[
+  "100_50_0",  "100_60_0",     "100_70_0",   "100_80_0",   "100_85_0",   "100_90_0",   "100_92p5_0",   "100_95_0",   "100_97_0",   "100_98_0",   "100_98p5_0",   "100_99_0",   "100_99p2_0",   "100_99p4_0",  
+  "125_75_0",  "125_85_0",     "125_95_0",  "125_105_0",  "125_110_0",  "125_115_0",  "125_117p5_0",  "125_120_0",  "125_122_0",  "125_123_0",  "125_123p5_0",  "125_124_0",  "125_124p2_0",  "125_124p4_0",  
+  "150_100_0",  "150_110_0",  "150_120_0",  "150_130_0",  "150_135_0",  "150_140_0",  "150_142p5_0",  "150_145_0",  "150_147_0",  "150_148_0",  "150_148p5_0",  "150_149_0",  "150_149p2_0",  "150_149p4_0",  
+  "175_125_0",  "175_135_0",  "175_145_0",  "175_155_0",  "175_160_0",  "175_165_0",  "175_167p5_0",  "175_170_0",  "175_172_0",  "175_173_0",  "175_173p5_0",  "175_174_0",  "175_174p2_0",  "175_174p4_0",  
+  "200_150_0",  "200_160_0",  "200_170_0",  "200_180_0",  "200_185_0",  "200_190_0",  "200_192p5_0",  "200_195_0",  "200_197_0",  "200_198_0",  "200_198p5_0",  "200_199_0",  "200_199p2_0",  "200_199p4_0",  
+  "225_175_0",  "225_185_0",  "225_195_0",  "225_205_0",  "225_210_0",  "225_215_0",  "225_217p5_0",  "225_220_0",  "225_222_0",  "225_223_0",  "225_223p5_0",  "225_224_0",  "225_224p2_0",  "225_224p4_0",  
+  "250_200_0",  "250_210_0",  "250_220_0",  "250_230_0",  "250_235_0",  "250_240_0",  "250_242p5_0",  "250_245_0",  "250_247_0",  "250_248_0",  "250_248p5_0",  "250_249_0",  "250_249p2_0",  "250_249p4_0",  
+  "275_225_0",  "275_235_0",  "275_245_0",  "275_255_0",  "275_260_0",  "275_265_0",  "275_267p5_0",  "275_270_0",  "275_272_0",  "275_273_0",  "275_273p5_0",  "275_274_0",  "275_274p2_0",  "275_274p4_0",  
+  "300_250_0",  "300_260_0",  "300_270_0",  "300_280_0",  "300_285_0",  "300_290_0",  "300_292p5_0",  "300_295_0",  "300_297_0",  "300_298_0",  "300_298p5_0",  "300_299_0",  "300_299p2_0",  "300_299p4_0",  
+  "325_275_0",  "325_285_0",  "325_295_0",  "325_305_0",  "325_310_0",  "325_315_0",  "325_317p5_0",  "325_320_0",  "325_322_0",  "325_323_0",  "325_323p5_0",  "325_324_0",  "325_324p2_0",  "325_324p4_0",  
+  "350_300_0",  "350_310_0",  "350_320_0",  "350_330_0",  "350_335_0",  "350_340_0",  "350_342p5_0",  "350_345_0",  "350_347_0",  "350_348_0",  "350_348p5_0",  "350_349_0",  "350_349p2_0",  "350_349p4_0",  
+  "375_325_0",  "375_335_0",  "375_345_0",  "375_355_0",  "375_360_0",  "375_365_0",  "375_367p5_0",  "375_370_0",  "375_372_0",  "375_373_0",  "375_373p5_0",  "375_374_0",  "375_374p2_0",  "375_374p4_0",  
+  "400_350_0",  "400_360_0",  "400_370_0",  "400_380_0",  "400_385_0",  "400_390_0",  "400_392p5_0",  "400_395_0",  "400_397_0",  "400_398_0",  "400_398p5_0",  "400_399_0",  "400_399p2_0",  "400_399p4_0",  
+  "425_375_0",  "425_385_0",  "425_395_0",  "425_405_0",  "425_410_0",  "425_415_0",  "425_417p5_0",  "425_420_0",  "425_422_0",  "425_423_0",  "425_423p5_0",  "425_424_0",  "425_424p2_0",  "425_424p4_0",  
+  "450_400_0",  "450_410_0",  "450_420_0",  "450_430_0",  "450_435_0",  "450_440_0",  "450_442p5_0",  "450_445_0",  "450_447_0",  "450_448_0",  "450_448p5_0",  "450_449_0",  "450_449p2_0",  "450_449p4_0",  
+  "475_425_0",  "475_435_0",  "475_445_0",  "475_455_0",  "475_460_0",  "475_465_0",  "475_467p5_0",  "475_470_0",  "475_472_0",  "475_473_0",  "475_473p5_0",  "475_474_0",  "475_474p2_0",  "475_474p4_0",  
+  "500_450_0",  "500_460_0",  "500_470_0",  "500_480_0",  "500_485_0",  "500_490_0",  "500_492p5_0",  "500_495_0",  "500_497_0",  "500_498_0",  "500_498p5_0",  "500_499_0",  "500_499p2_0",  "500_499p4_0",  
+  "525_475_0",  "525_485_0",  "525_495_0",  "525_505_0",  "525_510_0",  "525_515_0",  "525_517p5_0",  "525_520_0",  "525_522_0",  "525_523_0",  "525_523p5_0",  "525_524_0",  "525_524p2_0",  "525_524p4_0", 
+  "550_500_0",  "550_510_0",  "550_520_0",  "550_530_0",  "550_535_0",  "550_540_0",  "550_542p5_0",  "550_545_0",  "550_547_0",  "550_548_0",  "550_548p5_0",  "550_549_0",  "550_549p2_0",  "550_549p4_0",  
+  "575_525_0",  "575_535_0",  "575_545_0",  "575_555_0",  "575_560_0",  "575_565_0",  "575_567p5_0",  "575_570_0",  "575_572_0",  "575_573_0",  "575_573p5_0",  "575_574_0",  "575_574p2_0",  "575_574p4_0",  
+  "600_550_0",  "600_560_0",  "600_570_0",  "600_580_0",  "600_585_0",  "600_590_0",  "600_592p5_0",  "600_595_0",  "600_597_0",  "600_598_0",  "600_598p5_0",  "600_599_0",  "600_599p2_0",  "600_599p4_0",
+]
+
+def get_significance(path):
+    """Return numpy array of 'limit' branch."""
+    try:
+        with uproot.open(path) as f:
+            return f["limit"]["limit"].array(library="np")
+    except Exception as e:
+        return np.full(n_toys_per_file, np.nan)
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--dryrun", action='store_true', default=False, help="Only check for missing significance files")
+args = parser.parse_args()
+
+if __name__ == '__main__':
+    # ---------------------------
+    # Step 1. Discover mass points
+    # ---------------------------
+    allfiles = [f for f in os.listdir(indir) if f.startswith("higgsCombineTest.Significance")]
+    mass_points = sorted(list(set(re.findall(r"Significance\.([^.]+)\.", " ".join(allfiles)))))
+
+    print(f"Found {len(mass_points)} mass points.")
+    print(mass_points)
+
+    # Report extra or missing points
+    extra_points = sorted(set(mass_points) - set(signals))
+    missing_points = sorted(set(signals) - set(mass_points))
+
+    if extra_points:
+        print(f"⚠️ Found {len(extra_points)} unexpected mass points:")
+        for mp in extra_points:
+            print(f"  + {mp}")
+
+    if missing_points:
+        print(f"⚠️ Missing {len(missing_points)} expected mass points:")
+        for mp in missing_points:
+            print(f"  - {mp}")
+
+    # ---------------------------
+    # Step 2. Check completeness
+    # ---------------------------
+    missing = []
+    for mp in mass_points:
+        for i in range(0, n_jobs):
+            fname = f"higgsCombineTest.Significance.{mp}.{i}.root"
+            if not os.path.exists(os.path.join(indir, fname)):
+                missing.append(fname)
+
+    if missing:
+        print(f"❌ Missing {len(missing)} files, formatted as (masspoint, seed) --> can be copied into resub.sub for resubmission:")
+        for m in missing:#[:50]:
+            print("  ", m.split(".")[2], m.split(".")[3])
+        # print("... (showing first 50)")
+    else:
+        print("✅ All expected files found.")
+
+
+    if not args.dryrun:
+        # ---------------------------
+        # Step 3. Compute max significance per toy
+        # ---------------------------
+        n_total_toys = n_jobs * n_toys_per_file
+        max_sig = np.full(n_total_toys, -np.inf)
+
+        for mp in tqdm(mass_points, desc="Processing mass points"):
+            sig_all = np.full(n_total_toys, np.nan)
+            for i in range(n_jobs):
+                fname = f"higgsCombineTest.Significance.{mp}.{i}.root"
+                path = os.path.join(indir, fname)
+                sig = get_significance(path)
+
+                start = i * n_toys_per_file
+                end = start + len(sig)
+                sig_all[start:end] = sig
+
+            # Update maximum across mass points
+            max_sig = np.fmax(max_sig, sig_all)
+
+        # ---------------------------
+        # Step 4. Save results
+        # ---------------------------
+        np.save("max_significance_per_toy.npy", max_sig)
+        printt(f"✅ Saved {n_total_toys} max significance values to max_significance_per_toy.npy")
