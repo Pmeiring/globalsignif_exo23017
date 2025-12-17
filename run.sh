@@ -3,11 +3,11 @@ set -e
 unset PERL5LIB
 
 # Datacard folder (and rew scenario)
-eos=/eos/cms/store/group/phys_susy/SOS/limits_TChiWZ_neg_static_v2_merged/
+eos=/eos/cms/store/group/phys_susy/SOS/limits_TChiWZ_neg_static_20251124_merged/
 rew=neg
 
 # Output directory for toys and significances. Should contain subdirectories "toys" and "signif"
-toy=/eos/cms/store/group/phys_susy/SOS/someoutputdir/
+toy=/eos/cms/store/group/phys_susy/SOS/limits_TChiWZ_neg_static_20251124_toys/
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
