@@ -3,9 +3,9 @@ import os
 import numpy as np
 import ROOT
 
-input_file= "max_significance_per_toy.npy"
-plot_path = "./signif_tmp.png"
-max_local = 4.01 # maximum observed local significance
+input_file= "max_significance_per_toy_all_ctau.npy"
+plot_path = "./signif_tmp_allctau.png"
+max_local = 4.83 # maximum observed local significance
 
 if __name__ == '__main__':
 
